@@ -1,65 +1,67 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, prefer_final_fields
+// ignore_for_file: prefer_const_literals_to_create_immutables, deprecated_member_use, use_key_in_widget_constructors, prefer_final_fields
 
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
-  _MyAppState createState() => _MyAppState();
+  State<StatefulWidget> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  final controler = TextEditingController();
+  final controller = TextEditingController();
+
   List<bool> _selection = [true, false, false];
+
+  String? tip;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Total Amount"),
-              SizedBox(
-                width: 80,
-                child: TextField(
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  controller: controler,
-                  textAlign: TextAlign.center,
-                  decoration: InputDecoration(hintText: "\$100.00"),
-                ),
-              ),
+        home: Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (tip != null)
               Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ToggleButtons(
-                  children: [
-                    Text("10%"),
-                    Text("15%"),
-                    Text("20%"),
-                  ],
-                  isSelected: _selection,
-                  onPressed: updateSelection,
+                padding: const EdgeInsets.all(20),
+                child: Text(
+                  tip!,
+                  style: const TextStyle(fontSize: 30),
                 ),
               ),
-              TextButton(
+            const Text('Total Amount'),
+            SizedBox(
+              width: 70,
+              child: TextField(
+                controller: controller,
+                textAlign: TextAlign.center,
+                decoration: const InputDecoration(hintText: '\$100.00'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: ToggleButtons(children: [
+                const Text('10%'),
+                const Text('15%'),
+                const Text('20%')
+              ], isSelected: _selection, onPressed: updateSelection),
+            ),
+            FlatButton(
                 onPressed: calculateTip,
-                child: Text("Calculate Tip"),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  primary: Colors.white,
-                ),
-              )
-            ],
-          ),
+                child: const Text('Calculate Tip'),
+                color: Colors.green,
+                textColor: Colors.white)
+          ],
         ),
       ),
-    );
+    ));
   }
 
   void updateSelection(int selectedIndex) {
@@ -71,10 +73,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   void calculateTip() {
-    final totalAmount = double.parse(controler.text);
-    final seltectedIndex = _selection.indexWhere((element) => element);
-    final tipPercentage = [0.1, 0.15, 0.2][seltectedIndex];
+    final totalAmount = double.parse(controller.text);
+    final selectedIndex = _selection.indexWhere((element) => element);
+    final tipPercentage = [0.1, 0.15, 0.2][selectedIndex];
 
     final tipTotal = (totalAmount * tipPercentage).toStringAsFixed(2);
+
+    setState(() {
+      tip = '\$$tipTotal';
+    });
   }
 }
